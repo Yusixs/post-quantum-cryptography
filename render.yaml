@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: quantum-safe-encryption
+    env: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon  # or choose your preferred region
+    plan: free  # or choose your preferred plan
+    numInstances: 1
+    envVars:
+      - key: PORT
+        value: 8000
+    healthCheckPath: /
+    autoDeploy: true 
