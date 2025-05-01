@@ -1,13 +1,11 @@
 services:
   - type: web
-    name: quantum-safe-encryption
+    name: pqc-app
     env: docker
-    dockerfilePath: ./Dockerfile
-    region: oregon  # or choose your preferred region
-    plan: free  # or choose your preferred plan
-    numInstances: 1
+    region: oregon  # or choose another region
+    plan: free  # or choose a different plan
+    healthCheckPath: /
     envVars:
       - key: PORT
         value: 8000
-    healthCheckPath: /
-    autoDeploy: true 
+    dockerCommand: /bin/bash -c ". .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8000" 

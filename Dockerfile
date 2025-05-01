@@ -1,24 +1,50 @@
-FROM python:3.11-slim
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
 
 WORKDIR /app
 
-# Copy virtual environment
-COPY venv /app/venv
+# Install build tools
+RUN apt-get update && apt-get install -y \
+    git build-essential cmake libssl-dev unzip && \
+    apt-get clean
 
-# Copy application files
-COPY app /app/app
-COPY requirements.txt /app/
+# Create virtual environment
+RUN uv venv
 
-# Set environment variables
-ENV PATH="/app/venv/bin:$PATH"
-ENV PYTHONPATH="/app:/app/venv/lib/python3.11/site-packages"
-ENV VIRTUAL_ENV="/app/venv"
+# Install Python dependencies first
+COPY requirements.txt .
+RUN . .venv/bin/activate && \
+    uv pip install --upgrade pip && \
+    uv pip install -r requirements.txt
 
-# Make sure we're using the virtual environment's Python
-RUN ln -s /app/venv/bin/python /usr/local/bin/python
+# Clone pqcrypto + submodules and install
+RUN . .venv/bin/activate && \
+    git clone https://github.com/backbone-hq/pqcrypto.git && \
+    cd pqcrypto && \
+    git submodule update --init --recursive && \
+    # Create proper pyproject.toml
+    echo '[project]' > pyproject.toml && \
+    echo 'name = "pqcrypto"' >> pyproject.toml && \
+    echo 'version = "0.3.1"' >> pyproject.toml && \
+    echo 'description = "Post-quantum cryptography for Python."' >> pyproject.toml && \
+    echo 'authors = [{ name = "Backbone Authors", email = "root@backbone.dev" }]' >> pyproject.toml && \
+    echo 'license = { text = "Apache-2.0" }' >> pyproject.toml && \
+    echo 'readme = "README.md"' >> pyproject.toml && \
+    echo 'keywords = ["post-quantum", "cryptography", "security", "pqclean"]' >> pyproject.toml && \
+    echo 'requires-python = ">=3.9"' >> pyproject.toml && \
+    echo '[build-system]' >> pyproject.toml && \
+    echo 'requires = ["hatchling", "cffi", "jinja2", "setuptools"]' >> pyproject.toml && \
+    echo 'build-backend = "hatchling.build"' >> pyproject.toml && \
+    echo '[tool.setuptools]' >> pyproject.toml && \
+    echo 'py-modules = ["pqcrypto"]' >> pyproject.toml && \
+    # Use uv to compile
+    uv pip install hatchling cffi jinja2 setuptools && \
+    python compile.py && \
+    # Copy from inner pqcrypto/ subfolder to site-packages
+    mkdir -p /usr/local/lib/python3.11/site-packages/pqcrypto/ && \
+    cp -r pqcrypto/kem pqcrypto/_kem pqcrypto/sign pqcrypto/_sign pqcrypto/__init__.py /usr/local/lib/python3.11/site-packages/pqcrypto/
 
-# Expose the port the app runs on
-EXPOSE 8000
+# Copy app code
+COPY . .
 
-# Command to run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
+# Run your FastAPI app
+CMD ["/bin/bash", "-c", ". .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8000"]

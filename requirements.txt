@@ -3,6 +3,7 @@ uvicorn==0.27.1
 python-multipart==0.0.9
 jinja2==3.1.3
 aiofiles==23.2.1
+setuptools==65.5.1
 cryptography==42.0.2
 python-dotenv==1.0.1
 gunicorn==21.2.0
@@ -10,3 +11,6 @@ numpy
 pandas
 matplotlib
 setuptools
+pqcrypto
+jinja2
+cffi

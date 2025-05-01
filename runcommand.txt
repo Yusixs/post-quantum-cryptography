@@ -1,0 +1,11 @@
+Manual Way:
+- ./venv/Scripts/activate
+- uvicorn app.main:app --reload
+
+Docker Image
+- docker build -t pqc-app . (It's already built now ._.)
+- docker run -p 8000:8000 pqc-app
+
+
+Website on:
+http://localhost:8000/
