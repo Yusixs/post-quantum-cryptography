@@ -2,18 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy application files and requirements
+# Copy virtual environment first
+COPY venv /app/venv
+
+# Copy application files
 COPY app /app/app
 COPY requirements.txt /app/
 
-# Create and activate virtual environment
-RUN python -m venv /app/venv
-ENV PATH="/app/venv/bin:$PATH"
-
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
 # Set environment variables
+ENV PATH="/app/venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
 # Expose the port the app runs on
