@@ -2,11 +2,11 @@
 
 A secure web application demonstrating Post-Quantum Cryptography (PQC) techniques for encrypting and decrypting data using FastAPI and ML-KEM-512.
 
-![Post-Quantum Cryptography Demo](https://post-quantum-cryptography.onrender.com/)
-
 ## Overview
 
 This project implements a web-based demonstration of Post-Quantum Cryptography, specifically using the ML-KEM-512 algorithm. The application provides a user-friendly interface for key generation, message encryption, and decryption, showcasing the capabilities of quantum-resistant cryptography.
+
+![Application Homepage](images/homepage_before.png)
 
 ## Features
 
