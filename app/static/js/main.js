@@ -4,7 +4,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPublicKey = '';
     let currentPrivateKey = '';
 
-
+    // Auto-resize textarea function
+    function autoResizeTextarea(textarea) {
+        // Force a reflow to ensure the textarea is properly rendered
+        textarea.style.height = 'auto';
+        // Small delay to ensure the content is properly rendered
+        setTimeout(() => {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }, 0);
+    }
 
     // Initialize auto-resize for all textareas
     document.querySelectorAll('textarea').forEach(textarea => {
